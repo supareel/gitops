@@ -23,11 +23,13 @@ services:
       - KC_HOSTNAME_URL=https://sso.supareel.com
       - KC_HOSTNAME_STRICT_BACKCHANNEL=true
       - KC_HTTP_ENABLED=false
-      - KC_HTTPS_KEY_STORE_FILE=XXXXXXXXXXXXXXX
+      - KC_HTTPS_KEY_STORE_FILE=/etc/keycloak/certs/keycloak.jks
       - KC_HTTPS_KEY_STORE_PASSWORD=XXXXXXXXXXXXXXX
       - KC_LOG_CONSOLE_COLOR=true
-      - KC_TRUSTSTORE_PATHS=XXXXXXXXXXXXXXX
-      - KC_HTTPS_CERTIFICATE_FILE=XXXXXXXXXXXXXXX
-      - KC_HTTPS_CERTIFICATE_KEY_FILE=XXXXXXXXXXXXXXX
+      - KC_TRUSTSTORE_PATHS=/etc/keycloak/certs/kctruststore.keystore
+      - KC_HTTPS_CERTIFICATE_FILE=/etc/keycloak/certs/kc.crt
+      - KC_HTTPS_CERTIFICATE_KEY_FILE=/etc/keycloak/certs/kc.key
       - KC_DIR=./kcdata/exports
-    command: ["start"]
+    command: ["start", "--optimized"]
+    volumes:
+      - ./kcdata/certs/:/etc/keycloak/certs/
