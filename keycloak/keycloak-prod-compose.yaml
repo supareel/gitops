@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: sso_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+  keycloak:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: keycloak_sso
+    ports:
+      - "443:8443"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTPS_CLIENT_AUTH=required
+      - KC_DB_URL=jdbc:postgresql://db:5432/sso_db
+      - KC_DB_PASSWORD=postgres
+      - KC_DB_USERNAME=postgres
+      - KC_HEALTH_ENABLED=true
+      - KC_HOSTNAME_PATH=/_/admin
+      - KC_HOSTNAME_STRICT=true
+      - KC_HOSTNAME_URL=https://sso.supareel.com
+      - KC_HOSTNAME_STRICT_BACKCHANNEL=true
+      - KC_HTTP_ENABLED=false
+      - KC_HTTPS_KEY_STORE_FILE=/etc/keycloak/certs/keycloak.jks
+      - KC_HTTPS_KEY_STORE_PASSWORD=XXXXXXXXXX
+      - KC_LOG_CONSOLE_COLOR=true
+      - KC_HTTPS_CERTIFICATE_FILE=/etc/keycloak/certs/kc.crt
+      - KC_HTTPS_CERTIFICATE_KEY_FILE=/etc/keycloak/certs/kc.key
+      - KC_DIR=/etc/keycloak/exports
+    command: ["start", "--optimized"]
+    volumes:
+      - ./kcdata/certs/:/etc/keycloak/certs/
