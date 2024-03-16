@@ -19,7 +19,7 @@ services:
       - KC_HEALTH_ENABLED=true
       - KC_HOSTNAME=sso.supareel.com
       - KC_HOSTNAME_PATH=/_/admin
-      - KC_HOSTNAME_STRICT=
+      - KC_HOSTNAME_STRICT=true
       - KC_HOSTNAME_URL=https://sso.supareel.com
       - KC_HOSTNAME_STRICT_BACKCHANNEL=true
       - KC_HTTP_ENABLED=false
