@@ -20,6 +20,7 @@ services:
     ports:
       - "443:8443"
       - "8080:8080"
+      - "80:8080"
       - "8081:8081"
     environment:
       - KEYCLOAK_ADMIN=admin
@@ -29,12 +30,14 @@ services:
       - KC_DB_PASSWORD=postgres
       - KC_DB_USERNAME=postgres
       - KC_PROXY=edge
-      - KC_HTTP_PORT=8081
-      - KC_HOSTNAME_STRICT_BACKCHANNEL=true
+      - KC_HTTP_PORT=8080
       - PROXY_ADDRESS_FORWARDING=true
       - KC_HTTP_ENABLED=true
       - KC_LOG_CONSOLE_COLOR=true
       - KC_DIR=/etc/keycloak/exports
+      - KC_HOSTNAME=sso.supareel.com
+      - KC_HTTPS_PROTOCOLS=TLSv1.3,TLSv1.2
+      - KC_HOSTNAME_STRICT_HTTPS=false
     command: ["start", "--optimized"]
     volumes:
       - $PWD/kcdata/:/etc/keycloak/
