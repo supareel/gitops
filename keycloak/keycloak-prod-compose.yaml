@@ -28,19 +28,13 @@ services:
       - KC_DB_URL=jdbc:postgresql://db:5432/sso_db
       - KC_DB_PASSWORD=postgres
       - KC_DB_USERNAME=postgres
-      - KC_HEALTH_ENABLED=true
       - KC_PROXY=edge
-      - KC_HOSTNAME_URL=https://localhost:8081
-      - KC_HTTPS_PORT=8081
+      - KC_HTTP_PORT=8081
       - KC_HOSTNAME_STRICT_BACKCHANNEL=true
       - PROXY_ADDRESS_FORWARDING=true
-      - KC_HTTP_ENABLED=false
-      - KC_HTTPS_KEY_STORE_FILE=/etc/keycloak/certs/keycloak.jks
-      - KC_HTTPS_KEY_STORE_PASSWORD=foxbat
+      - KC_HTTP_ENABLED=true
       - KC_LOG_CONSOLE_COLOR=true
-      - KC_HTTPS_CERTIFICATE_FILE=/etc/keycloak/certs/keycloak-server.crt.pem
-      - KC_HTTPS_CERTIFICATE_KEY_FILE=/etc/keycloak/certs/keycloak-server.key.pem
       - KC_DIR=/etc/keycloak/exports
     command: ["start", "--optimized"]
     volumes:
-      - $PWD/kcdata/certs/:/etc/keycloak/certs/
+      - $PWD/kcdata/:/etc/keycloak/
