@@ -16,7 +16,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: keycloak_sso
     ports:
       - "443:8443"
       - "8080:8080"
@@ -26,18 +25,21 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_HTTPS_CLIENT_AUTH=required
+      - KC_DB=postgres
       - KC_DB_URL=jdbc:postgresql://db:5432/sso_db
       - KC_DB_PASSWORD=postgres
       - KC_DB_USERNAME=postgres
-      - KC_PROXY=edge
-      - KC_HTTP_PORT=8080
-      - PROXY_ADDRESS_FORWARDING=true
-      - KC_HTTP_ENABLED=true
       - KC_LOG_CONSOLE_COLOR=true
       - KC_DIR=/etc/keycloak/exports
-      - KC_HOSTNAME=sso.supareel.com
       - KC_HTTPS_PROTOCOLS=TLSv1.3,TLSv1.2
+      - KC_HOSTNAME=localhost:8080
+      - KC_HTTP_PORT=8080
       - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_FEATURES=token-exchange,admin-fine-grained-authz
+      - PROXY_ADDRESS_FORWARDING=true
+      - KC_HOSTNAME_STRICT_BACKCHANNEL=true
     command: ["start", "--optimized"]
     volumes:
       - $PWD/kcdata/:/etc/keycloak/
