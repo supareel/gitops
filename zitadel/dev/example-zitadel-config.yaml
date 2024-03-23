@@ -1,0 +1,36 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
+Log:
+  Level: 'info'
+
+# Make ZITADEL accessible over HTTP, not HTTPS
+ExternalSecure: true
+ExternalDomain: sso.supareel.com # change this to your domain
+ExternalPort: 443
+
+# If not using the docker compose example, adjust these values for connecting sso to your CockroachDB
+# Database:
+#   postgres:
+#     Host: localhost
+#     Port: 5432
+#     Database: zitadel
+#     MaxOpenConns: 25
+#     MaxIdleConns: 10
+#     MaxConnLifetime: 1h
+#     MaxConnIdleTime: 5m
+#     Options:
+#     User:
+#       Username: zitadel
+#       Password: zitadel
+#       SSL:
+#         Mode: disable
+#         RootCert:
+#         Cert:
+#         Key:
+#     Admin:
+#       Username: postgres
+#       Password: postgres
+#       SSL:
+#         Mode: disable
+#         RootCert:
+#         Cert:
+#         Key:

@@ -1,0 +1,39 @@
+Database:
+  # ZITADEL manages three database connection pools.
+  # The *ConnRatio settings define the ratio of how many connections from
+  # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
+  # Remaining connection are used for queries (search).
+  # Values may not be negative and the sum of the ratios must always be less than 1.
+  # For example this defaults define 40 MaxOpenConns overall.
+  # - 40*0.2=8 connections are allocated to the event pusher;
+  # - 40*0.2=8 connections are allocated to the projection spooler;
+  # - 40-(8+8)=24 connections are remaining for queries;
+  EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
+  ProjectionSpoolerConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
+  # Postgres is used as soon as a value is set
+  # The values describe the possible fields to set values
+  postgres:
+    Host: 'db' # ZITADEL_DATABASE_POSTGRES_HOST
+    Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
+    Database: 'sso' # ZITADEL_DATABASE_POSTGRES_DATABASE
+    MaxOpenConns: 20 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 20 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: 40 # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: 40 # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
+    User:
+      Username: 'postgres' # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+      Password: 'postgres' # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+      SSL:
+        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
+        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
+    Admin:
+      Username: 'admin' # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
+      Password: 'postgresAdmin' # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
+      SSL:
+        Mode: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
+        RootCert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
+        Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
+        Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
