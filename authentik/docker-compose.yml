@@ -1,7 +1,13 @@
----
 version: "3.4"
 
 services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
   postgresql:
     image: docker.io/library/postgres:12-alpine
     restart: unless-stopped
@@ -19,6 +25,7 @@ services:
       POSTGRES_DB: ${PG_DB:-authentik}
     env_file:
       - .env
+
   redis:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
@@ -31,6 +38,7 @@ services:
       timeout: 3s
     volumes:
       - redis:/data
+
   server:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.2.2}
     restart: unless-stopped
@@ -52,6 +60,7 @@ services:
     depends_on:
       - postgresql
       - redis
+
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.2.2}
     restart: unless-stopped
