@@ -1,11 +1,84 @@
-version: '3.8'
+version: '3'
 
 services:
-  keycloak:
-    image: quay.io/keycloak/keycloak:24.0.1
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: always
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: 'true'
     ports:
-      - "7055:8080"
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/data/certs:/etc/nginx/certs:ro
+      - ./nginx/data/conf.d:/etc/nginx/conf.d
+      - ./nginx/data/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/data/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - webproxy
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    volumes:
+      - ./nginx/data/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/data/certs:/etc/nginx/certs:rw
+      - ./nginx/data/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx-proxy
+    networks:
+      - webproxy
+
+  keycloak:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: keycloak
+    restart: always
+    environment: 
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTPS_CLIENT_AUTH: required
+      KC_DB: postgres
+      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KC_DB_URL: jdbc:postgresql://db:5432/${DB_DATABASE}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_DB_USERNAME: ${DB_USER}
+      KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KC_LOG_CONSOLE_COLOR: true
+      KC_DIR: /etc/keycloak/exports
+      KC_HTTPS_CERTIFICATE_FILE: /etc/keycloak/certs/localhost.crt.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/keycloak/certs/localhost.key.pem
+      KC_HTTP_ENABLED: false
+      PROXY_ADDRESS_FORWARDING: ${PROXY_ADDRESS_FORWARDING}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    depends_on:
+      - postgres
+    networks:
+      - webproxy
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-    command: ["start-dev"]
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - webproxy  
+   
+networks:
+  webproxy:
+
+volumes:
+  data:

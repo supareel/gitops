@@ -4,14 +4,20 @@ services:
   db:
     image: postgres
     restart: always
-    ports:
-      - "5432:5432"
+    networks:
+      - keycloak_pg_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_DB: sso_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
       - ./data:/var/lib/postgresql/data
+
   keycloak:
     build:
       context: .
@@ -19,26 +25,30 @@ services:
     image: keycloak_service
     ports:
       - "8443:8443"
-      - "8080:8080"
+      - "8090:8090"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - keycloak_pg_net
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HTTPS_CLIENT_AUTH=required
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://db:5432/sso_db
-      - KC_DB_PASSWORD=postgres
-      - KC_DB_USERNAME=postgres
-      - KC_LOG_CONSOLE_COLOR=true
-      - KC_DIR=/etc/keycloak/exports
-      - KC_HTTPS_PROTOCOLS=TLSv1.3,TLSv1.2
-      - KC_HOSTNAME=https://sso.supareel.com
-      - KC_HTTP_PORT=8080
-      - KC_HOSTNAME_STRICT_HTTPS=false
-      - KC_HTTP_ENABLED=true
-      - KC_PROXY=edge
-      - KC_FEATURES=token-exchange,admin-fine-grained-authz
-      - PROXY_ADDRESS_FORWARDING=true
-      - KC_HOSTNAME_STRICT_BACKCHANNEL=true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTPS_CLIENT_AUTH: required
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/sso_db
+      KC_DB_PASSWORD: postgres
+      KC_DB_USERNAME: postgres
+      KC_LOG_CONSOLE_COLOR: true
+      KC_DIR: /etc/keycloak/exports
+      KC_HTTPS_CERTIFICATE_FILE: /etc/keycloak/certs/localhost.crt.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/keycloak/certs/localhost.key.pem
+      KC_HTTP_ENABLED: false
     command: ["start", "--optimized"]
     volumes:
-      - $PWD/kcdata/:/etc/keycloak/
+      - ./kcdata/:/etc/keycloak/
+
+networks:
+  keycloak_pg_net:
+    driver: 
+      bridge
