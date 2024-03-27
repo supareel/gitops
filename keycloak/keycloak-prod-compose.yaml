@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   keycloak:
-    image: ssokeycloak:1.0.0
+    image: keycloak-custom:1.0.0
     ports:
       - "8443:8443"
       - "8090:8090"
@@ -13,9 +13,9 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTPS_CLIENT_AUTH: required
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db:5432/sso
-      KC_DB_PASSWORD: secret
-      KC_DB_USERNAME: aitplacements_owner
+      KC_DB_URL: db_url
+      KC_DB_PASSWORD: db_pass
+      KC_DB_USERNAME: db_user
       KC_HOSTNAME_STRICT: 'false'
       KC_LOG_CONSOLE_COLOR: 'true'
       KC_DIR: /etc/keycloak/exports
