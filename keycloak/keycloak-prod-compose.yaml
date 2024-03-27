@@ -1,34 +1,11 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres
-    restart: always
-    networks:
-      - keycloak_pg_net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      POSTGRES_DB: sso_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - ./data:/var/lib/postgresql/data
-
   keycloak:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: keycloak_service
+    image: ssokeycloak:1.0.0
     ports:
       - "8443:8443"
       - "8090:8090"
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - keycloak_pg_net
     environment:
@@ -36,14 +13,15 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTPS_CLIENT_AUTH: required
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db:5432/sso_db
-      KC_DB_PASSWORD: postgres
-      KC_DB_USERNAME: postgres
-      KC_LOG_CONSOLE_COLOR: true
+      KC_DB_URL: jdbc:postgresql://db:5432/sso
+      KC_DB_PASSWORD: secret
+      KC_DB_USERNAME: aitplacements_owner
+      KC_HOSTNAME_STRICT: 'false'
+      KC_LOG_CONSOLE_COLOR: 'true'
       KC_DIR: /etc/keycloak/exports
-      KC_HTTPS_CERTIFICATE_FILE: /etc/keycloak/certs/localhost.crt.pem
-      KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/keycloak/certs/localhost.key.pem
-      KC_HTTP_ENABLED: false
+      KC_HTTP_ENABLED: 'true'
+      KC_HTTP_PORT: '8090'
+      KC_PROXY_HEADERS: 'xforwarded'
     command: ["start", "--optimized"]
     volumes:
       - ./kcdata/:/etc/keycloak/
